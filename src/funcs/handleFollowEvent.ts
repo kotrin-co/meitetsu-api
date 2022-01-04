@@ -1,22 +1,6 @@
 import { FollowEvent } from "@line/bot-sdk";
-import {
-  client,
-  dynamo
-} from "../app";
-
-const TABLE_NAME = process.env.TABLE_NAME!;
-
-type DynamoInsertParams = {
-  TableName: string;
-  Item: {
-    lineId: string;
-    displayName: string;
-    followedAt: number;
-    invitedBy: string;
-    invite: string[];
-    birthday: string;
-  }
-};
+import { client } from "../app";
+import User from "../models/User";
 
 const handleFollowEvent = async (event: FollowEvent) => {
   if (event.type !== "follow") {
@@ -28,40 +12,13 @@ const handleFollowEvent = async (event: FollowEvent) => {
   const profile = await client.getProfile(lineId);
   const displayName = profile.displayName;
 
-  await insertUserData(lineId, displayName);
+  const user = new User(lineId, displayName);
+  const insert = await user.createUserRecord();
+  const returnMessage = insert ? `${displayName}さん、お友だち登録ありがとうございます^^ ダイナモにデータを格納しました^^` : "すでにお友だち登録されています";
   await client.replyMessage(replyToken, {
     type: "text",
-    text: `${displayName}さん、お友だち登録ありがとうございます^^ ダイナモにデータを格納しました^^`
-  })
-};
-
-const insertUserData = (
-  lineId: string,
-  displayName: string
-) => {
-  return new Promise((resolve, reject) => {
-    const insertParams: DynamoInsertParams = {
-      TableName: TABLE_NAME,
-      Item: {
-        "lineId": lineId,
-        "displayName": displayName,
-        "followedAt": new Date().getTime(),
-        "invitedBy": "",
-        "invite": [],
-        "birthday": "",
-      }
-    };
-
-    dynamo.put(insertParams, (err, data) => {
-      if (err) {
-        console.log(err);
-        reject(err);
-      } else {
-        console.log("inserted successfully!", data);
-        resolve(data);
-      }
-    })
+    text: returnMessage,
   });
-}
+};
 
 export default handleFollowEvent;

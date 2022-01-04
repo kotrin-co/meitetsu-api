@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "postbuild": "cp -R src/views dist/ && cp package*json dist/ && cp src/vendia-logo.png dist/ ",
+    "postbuild": "cp -R src/views dist/ && cp package*json dist/ ",
     "create-bucket": "cross-var aws s3 mb s3://$npm_package_config_s3BucketName --region $npm_package_config_region",
     "delete-bucket": "cross-var aws s3 rb s3://$npm_package_config_s3BucketName --region $npm_package_config_region",
     "delete-stack": "cross-var aws cloudformation delete-stack --stack-name $npm_package_config_cloudFormationStackName --region $npm_package_config_region",
