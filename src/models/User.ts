@@ -1,4 +1,4 @@
-import {dynamo} from "../app";
+import { dynamo } from "../app";
 const TABLE_NAME = process.env.TABLE_NAME!;
 
 type UserRecord = {
@@ -8,6 +8,7 @@ type UserRecord = {
   invitedBy: string;
   invite: string[];
   birthday: string;
+  birthyear: string;
 };
 
 class User {
@@ -28,7 +29,8 @@ class User {
           followedAt: new Date().getTime(),
           invitedBy: "",
           invite: [],
-          birthday: ""
+          birthday: "",
+          birthyear: "",
         }
         const insertParams = {
           TableName: TABLE_NAME,
@@ -46,6 +48,44 @@ class User {
         });
       }
     });
+  }
+
+  public birthRegist(birthday: string): Promise<{registered: boolean; date: string}> {
+    return new Promise(async (resolve, reject) => {
+      const birthArray = birthday.split("/");
+      const registeredBirth = await this.birthCheck(this.lineId);
+      if (registeredBirth) {
+        resolve({
+          registered: true,
+          date: registeredBirth
+        });
+      } else {
+        const updateParams = {
+          TableName: TABLE_NAME,
+          Key: {
+            lineId: this.lineId
+          },
+          UpdateExpression: "set birthday = :date, birthyear = :year",
+          ExpressionAttributeValues: {
+            ":date": `${birthArray[1]}-${birthArray[2]}`,
+            ":year": birthArray[0]
+          },
+          ReturnedValue: "UPDATED",
+        };
+        dynamo.update(updateParams, (err, data) => {
+          if (err) {
+            console.log(err);
+            reject(err);
+          } else {
+            console.log("お誕生日登録成功", data);
+            resolve({
+              registered: false,
+              date: birthday,
+            });
+          }
+        })
+      }
+    })
   }
 
   private checkRecordExistence(lineId: string): Promise<boolean> {
@@ -69,6 +109,29 @@ class User {
         }
       });
     });
+  }
+
+  private birthCheck(lineId: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const selectParams = {
+        TableName: TABLE_NAME,
+        Key: {
+          lineId,
+        }
+      };
+
+      dynamo.get(selectParams, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          if (data.Item !== undefined) {
+            resolve(data.Item.birthday);
+          } else {
+            resolve("");
+          }
+        }
+      });
+    })
   }
 };
 

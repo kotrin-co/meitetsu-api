@@ -1,6 +1,7 @@
 import { FollowEvent } from "@line/bot-sdk";
 import { client } from "../app";
 import User from "../models/User";
+import birthdayRegistrationFlex from "../messageTemplates/birthdayRegistrationFlex";
 
 const handleFollowEvent = async (event: FollowEvent) => {
   if (event.type !== "follow") {
@@ -14,11 +15,10 @@ const handleFollowEvent = async (event: FollowEvent) => {
 
   const user = new User(lineId, displayName);
   const insert = await user.createUserRecord();
-  const returnMessage = insert ? `${displayName}さん、お友だち登録ありがとうございます^^ ダイナモにデータを格納しました^^` : "すでにお友だち登録されています";
-  await client.replyMessage(replyToken, {
-    type: "text",
-    text: returnMessage,
-  });
+  const message = insert ? `${displayName}さんをDynamoDBへ格納成功` : `${displayName}さんはすでにお友だち登録されています`;
+  console.log(message);
+  const birthRegistMessage = birthdayRegistrationFlex();
+  await client.replyMessage(replyToken, birthRegistMessage);
 };
 
 export default handleFollowEvent;

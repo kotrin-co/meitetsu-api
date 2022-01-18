@@ -4,6 +4,7 @@ import {
 } from "@line/bot-sdk";
 import {handleTextEvent} from "../funcs/handleMessageEvent";
 import handleFollowEvent from "../funcs/handleFollowEvent";
+import handlePostbackEvent from "../funcs/handlePostbackEvent";
 
 const linebot = async (req: Request, res: Response): Promise<void> => {
   const events: WebhookEvent[] = req.body.events;
@@ -17,6 +18,10 @@ const linebot = async (req: Request, res: Response): Promise<void> => {
           case "message":
             await handleTextEvent(event);
             break;
+          case "postback":
+            await handlePostbackEvent(event);
+            break;
+
         }
       } catch (error) {
         console.log(error);
