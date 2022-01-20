@@ -34,6 +34,22 @@ Resources:
           Properties:
             ApiId: !Ref ExpressApi
 
+  cronLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./dist
+      FunctionName: birthday-watcher
+      Handler: lambda.birthWatcher
+      MemorySize: 256
+      Timeout: 30
+      Runtime: nodejs14.x
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Name: birth-watch-rule
+            Schedule: cron(0 2 * * ? *)
+
   Table:
     Type: 'AWS::DynamoDB::Table'
     Properties:

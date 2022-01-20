@@ -4,9 +4,8 @@ import {
   dynamo
 } from "../app";
 import invitationFlex from "../messageTemplates/invitationFlex";
-import birthdayRegistrationFlex from "../messageTemplates/birthdayRegistrationFlex";
 import benefitsImageMap from "../messageTemplates/benefitsImageMap";
-import birthConfirmTemplate from "../messageTemplates/birthConfirmTemplate";
+import birthConfirmFlex from "../messageTemplates/birthConfirmFlex";
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
@@ -21,16 +20,18 @@ export const handleTextEvent = async (event: MessageEvent) => {
   const displayName = profile.displayName;
 
   // 誕生日を正規表現でチェック
-  const regex = /^[0-9]{4}\/([0-9]{1,2})\/([0-9]{1,2})$/;
+  const regex = /^(\d{4})年(\d{1,2})月(\d{1,2})日$/;
   if (regex.test(text)) {
     // 値が適正かチェック
-    const birthArray = text.split("/");
+    const birthYear = Number(text.split("年")[0]);
+    const birthMonth = Number(text.split("月")[0].split("年")[1]);
+    const birthDate = Number(text.split("月")[1].split("日")[0]);
     if (
-      Number(birthArray[0]) > 1950 && Number(birthArray[0]) <= new Date().getFullYear()
-      && Number(birthArray[1]) > 0 && Number(birthArray[1]) <= 12
-      && Number(birthArray[2]) > 0 && Number(birthArray[2]) <= 31
+      birthYear > 1922 && birthYear <= new Date().getFullYear()
+      && birthMonth > 0 && birthMonth <= 12
+      && birthDate > 0 && birthDate <= 31
     ) {
-      const birthConfirmMessage = birthConfirmTemplate(displayName, text);
+      const birthConfirmMessage = birthConfirmFlex(displayName, birthYear, birthMonth, birthDate);
       await client.replyMessage(replyToken, birthConfirmMessage);
     }
   } else {
@@ -51,11 +52,6 @@ export const handleTextEvent = async (event: MessageEvent) => {
       case "answerの公式LINEアカウントの友達紹介特典を確認する":
         const imageMapMessage = benefitsImageMap();
         await client.replyMessage(replyToken, imageMapMessage);
-        break;
-
-      case "誕生日":
-        const birthRegistMessage = birthdayRegistrationFlex();
-        await client.replyMessage(replyToken, birthRegistMessage);
         break;
     }
   }

@@ -29,7 +29,7 @@ class User {
           followedAt: new Date().getTime(),
           invitedBy: "",
           invite: [],
-          birthday: "",
+          birthday: "not-registered",
           birthyear: "",
         }
         const insertParams = {
@@ -54,12 +54,7 @@ class User {
     return new Promise(async (resolve, reject) => {
       const birthArray = birthday.split("/");
       const registeredBirth = await this.birthCheck(this.lineId);
-      if (registeredBirth) {
-        resolve({
-          registered: true,
-          date: registeredBirth
-        });
-      } else {
+      if (registeredBirth === "not-registered" || registeredBirth === "") {
         const updateParams = {
           TableName: TABLE_NAME,
           Key: {
@@ -83,7 +78,12 @@ class User {
               date: birthday,
             });
           }
-        })
+        });
+      } else {
+        resolve({
+          registered: true,
+          date: registeredBirth
+        });
       }
     })
   }

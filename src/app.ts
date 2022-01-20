@@ -6,7 +6,7 @@ import {
   ClientConfig,
   Client,
 } from "@line/bot-sdk";
-import {DynamoDB} from "aws-sdk";
+import { DynamoDB } from "aws-sdk";
 import router from "./routes/router";
 
 const clientConfig: ClientConfig = {

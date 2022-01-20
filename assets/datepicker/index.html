@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>美容室answer</title>
+  <link rel="stylesheet" type="text/css" href="css/datepicker.css">
+  <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+  <script type="text/javascript" src="js/jquery.flickEndless-1.0.3.js"></script>
+  <script type="text/javascript" src="js/common.js"></script>
+  <script type="text/javascript" src="js/datepicker.js"></script>
+</head>
+<body>
+  <div>
+    <h4 id="birth-select" style="text-align: center">お誕生日選択</h4>
+    <input type="hidden" value="" id="birth-year">
+    <input type="hidden" value="" id="birth-month">
+    <input type="hidden" value="" id="birth-date">
+    <div id="datepicker">
+      <div class="dp_header">
+        <div class="dp_year">year</div><div class="dp_month">month</div><div class="dp_day">day</div>
+      </div>
+      <div id="datescroller">
+        <div class="dp_scroller dp_year"><div id="dp_year" class="dp_roll"><ul></ul><div class="dp_smoke dp_top"></div><div class="dp_smoke dp_bottom"></div></div></div>
+        <div class="dp_scroller dp_month"><div id="dp_month" class="dp_roll"><ul></ul><div class="dp_smoke dp_top"></div><div class="dp_smoke dp_bottom"></div></div></div>
+        <div class="dp_scroller dp_day">
+          <div id="dp_day28" class="dp_roll dp_dd"><ul></ul><div class="dp_smoke dp_top"></div><div class="dp_smoke dp_bottom"></div></div>
+          <div id="dp_day29" class="dp_roll dp_dd"><ul></ul><div class="dp_smoke dp_top"></div><div class="dp_smoke dp_bottom"></div></div>
+          <div id="dp_day30" class="dp_roll dp_dd"><ul></ul><div class="dp_smoke dp_top"></div><div class="dp_smoke dp_bottom"></div></div>
+          <div id="dp_day31" class="dp_roll dp_dd"><ul></ul><div class="dp_smoke dp_top"></div><div class="dp_smoke dp_bottom"></div></div>
+        </div>
+        <div class="dp_clear"></div>
+        <div class="dp_view"></div>
+      </div>
+      <div class="dp_footer">
+        <input type="button" class="dp_button" id="dp_ok" value="決定" />
+      </div>
+    </div>
+  </div>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="js/liff.js"></script>
+</body>
+</html>
