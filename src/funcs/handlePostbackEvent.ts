@@ -24,7 +24,7 @@ const handlePostbackEvent = async (event: PostbackEvent) => {
       if (registered) {
         await client.replyMessage(replyToken, {
           type: "text",
-          text: `${displayName}さんのお誕生日は${date.split("-")[0]}月${date.split("-")[1]}日で登録されています`
+          text: `${displayName}さんのお誕生日は${date.split("-")[0]}月${date.split("-")[1]}日で登録されております\u{1F60A}\nプレゼントを楽しみにしていてくださいね\u{2728}\u{2728}`
         });
       } else {
         await client.replyMessage(replyToken, {
