@@ -24,6 +24,7 @@ type UserRecord = {
 };
 
 export const birthWatcher = async () => {
+  console.log("birthWatcer実行！！", new Date().getTime());
   const targetUsers: any = await getTargetUsers();
   if (targetUsers.length) {
     const promises = [];

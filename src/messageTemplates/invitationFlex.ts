@@ -1,6 +1,6 @@
 import { FlexMessage } from "@line/bot-sdk";
 const INVITATION_IMAGE = "https://answer.salon/line_images/invitation.png";
-const LIFF_URL = "https://liff.line.me/1656766461-wQ2eRLYQ";
+const LIFF_URL = "https://liff.line.me/1656653769-Ojal0y9l";
 
 const invitationFlex = (lineId: string): FlexMessage => {
   return {

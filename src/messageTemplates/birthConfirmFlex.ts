@@ -1,6 +1,6 @@
 import { FlexMessage } from "@line/bot-sdk";
 
-const DATEPICKER_LIFF_URL = "https://liff.line.me/1656766461-gKzBwL6O";
+const DATEPICKER_LIFF_URL = "https://liff.line.me/1656653769-LwYV6paV";
 
 const birthConfirmFlex = (
   name: string,

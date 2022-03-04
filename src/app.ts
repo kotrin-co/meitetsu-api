@@ -17,7 +17,7 @@ export const client = new Client(clientConfig);
 export const dynamo = new DynamoDB.DocumentClient();
 
 const allowedOrigins = [
-  "https://d2p0c8hsqc.execute-api.ap-northeast-1.amazonaws.com",
+  "https://0d46nffa3e.execute-api.ap-northeast-1.amazonaws.com",
 ];
 const corsOptions: cors.CorsOptions = {
   origin: allowedOrigins,

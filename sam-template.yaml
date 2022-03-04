@@ -23,6 +23,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./dist
+      FunctionName: serverless-lambda-prd
       PackageType: Zip
       Runtime: nodejs14.x
       Handler: lambda.handler
@@ -38,7 +39,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./dist
-      FunctionName: birthday-watcher
+      FunctionName: birthday-watcher-prd
       Handler: lambda.birthWatcher
       MemorySize: 256
       Timeout: 30
@@ -47,13 +48,13 @@ Resources:
         Schedule:
           Type: Schedule
           Properties:
-            Name: birth-watch-rule
+            Name: birth-watch-prd-rule
             Schedule: cron(0 2 * * ? *)
 
   Table:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: UsersTest
+      TableName: Users_Prd
       AttributeDefinitions:
         - AttributeName: lineId
           AttributeType: S
