@@ -13,18 +13,8 @@ export const dynamo = new DynamoDB.DocumentClient();
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
-type UserRecord = {
-  lineId: string;
-  displayName: string;
-  followedAt: number;
-  invitedBy: string;
-  invite: string[];
-  birthday: string;
-  birthyear: string;
-};
-
 export const birthWatcher = async () => {
-  console.log("birthWatcer実行！！", new Date().getTime());
+  console.log("birthWatcher実行！", new Date().getTime());
   const targetUsers: any = await getTargetUsers();
   if (targetUsers.length) {
     const promises = [];
@@ -33,7 +23,7 @@ export const birthWatcher = async () => {
       promises.push(
         client.pushMessage(user.lineId, {
           type: "text",
-          text: `${user.displayName}さん、お誕生日おめでとうございます！`,
+          text: `${user.displayName}さん、お誕生日おめでとうございます\u{2728}\u{2728}\n\nこれはお誕生日プレゼントメッセージです`,
         })
       );
     }
