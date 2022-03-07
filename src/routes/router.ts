@@ -19,16 +19,14 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 router.post("/invited", (req: Request, res: Response) => {
   const {
-    myLineId,
-    name,
     invitedBy,
+    idToken,
   } = req.body;
   handleInvitation(
     req,
     res,
-    myLineId,
-    name,
     invitedBy,
+    idToken
   );
 });
 

@@ -1,15 +1,6 @@
 import { dynamo } from "../app";
 const TABLE_NAME = process.env.TABLE_NAME!;
-
-type UserRecord = {
-  lineId: string;
-  displayName: string;
-  followedAt: number;
-  invitedBy: string;
-  invite: string[];
-  birthday: string;
-  birthyear: string;
-};
+import {UserRecord} from "../types";
 
 class User {
   constructor(

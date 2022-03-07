@@ -1,23 +1,39 @@
 import {Request, Response} from "express";
 import {dynamo} from "../app";
+import axios from "axios";
+import qs from "qs";
+const LIFF_ID_INVITATION = process.env.LIFF_ID_INVITATION!;
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
 const handleInvitation = async (
   req: Request,
   res: Response,
-  myLineId: string,
-  name: string,
-  invitedBy: string
+  invitedBy: string,
+  idToken: string
 ) => {
-  const duplicate = await checkDuplicate(myLineId, invitedBy);
-  console.log("duplicate => ", duplicate);
-  if (!duplicate && (myLineId !== invitedBy)) {
-    await updateInvited(myLineId, invitedBy);
-    await updateInviter(myLineId, invitedBy);
-    res.status(200).send("Invitation Success!");
-  } else {
-    res.status(201).send("Invitation failed!");
+  // idTokenからユーザー情報を取得する
+  const loginChannelId = LIFF_ID_INVITATION.split("-")[0];
+  console.log("invite params => ", invitedBy, idToken, loginChannelId);
+  const postData = {
+    id_token: idToken,
+    client_id: loginChannelId,
+  };
+  try {
+    const response = await axios.post("https://api.line.me/oauth2/v2.1/verify", qs.stringify(postData));
+    const myLineId = response.data.sub;
+    console.log("res => ", response.data);
+    const duplicate = await checkDuplicate(myLineId, invitedBy);
+    console.log("duplicate => ", duplicate);
+    if (!duplicate && (myLineId !== invitedBy)) {
+      await updateInvited(myLineId, invitedBy);
+      await updateInviter(myLineId, invitedBy);
+      res.status(200).send("Invitation Success!");
+    } else {
+      res.status(201).send("Invitation failed!");
+    }
+  } catch (error) {
+
   }
 }
 
@@ -26,14 +42,21 @@ const checkDuplicate = (
   inviterId: string
 ): Promise<Boolean> => {
   return new Promise((resolve, reject) => {
-    const selectParams = {
+    const selectParams_1 = {
       TableName: TABLE_NAME,
       Key: {
         "lineId": inviterId,
       }
     };
 
-    dynamo.get(selectParams, (err, data) => {
+    const selectParams_2 = {
+      TableName: TABLE_NAME,
+      Key: {
+        "lineId": invitedId,
+      }
+    };
+
+    dynamo.get(selectParams_1, (err, data) => {
       if (err) {
         console.log(err);
         reject(err);
@@ -41,8 +64,23 @@ const checkDuplicate = (
         if (data.Item !== undefined) {
           const inviteList = data.Item.invite;
           console.log("inviteList", inviteList);
-          const check = inviteList.includes(invitedId) ? true : false;
-          resolve(check);
+          let check = inviteList.includes(invitedId) ? true : false;
+          dynamo.get(selectParams_2, (err, data) => {
+            if (err) {
+              console.log(err);
+              reject(err);
+            } else {
+              if (data.Item !== undefined) {
+                const invitedBy = data.Item.invitedBy;
+                if (invitedBy === inviterId) check = true;
+                resolve(check);
+              } else {
+                reject("データなし");
+              }
+            }
+          });
+        } else {
+          reject("データなし");
         }
       }
     });
