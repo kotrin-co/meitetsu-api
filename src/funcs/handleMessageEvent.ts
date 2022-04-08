@@ -4,8 +4,9 @@ import {
   dynamo
 } from "../app";
 import invitationFlex from "../messageTemplates/invitationFlex";
-import benefitsImageMap from "../messageTemplates/benefitsImageMap";
+// import benefitsImageMap from "../messageTemplates/benefitsImageMap";
 import birthConfirmFlex from "../messageTemplates/birthConfirmFlex";
+import benefitsFlex from "../messageTemplates/benefitsFlex";
 
 const TABLE_NAME = process.env.TABLE_NAME!;
 
@@ -21,6 +22,7 @@ export const handleTextEvent = async (event: MessageEvent) => {
 
   // 誕生日を正規表現でチェック
   const regex = /^(\d{4})年(\d{1,2})月(\d{1,2})日$/;
+
   if (regex.test(text)) {
     // 値が適正かチェック
     const birthYear = Number(text.split("年")[0]);
@@ -50,8 +52,9 @@ export const handleTextEvent = async (event: MessageEvent) => {
         break;
 
       case "answerの公式LINEアカウントの友達紹介特典を確認する":
-        const imageMapMessage = benefitsImageMap();
-        await client.replyMessage(replyToken, imageMapMessage);
+        // const imageMapMessage = benefitsImageMap();
+        const benefitsFlexMessage = benefitsFlex();
+        await client.replyMessage(replyToken, benefitsFlexMessage);
         break;
     }
   }
