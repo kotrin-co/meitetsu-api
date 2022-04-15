@@ -3,6 +3,8 @@ import {
   ClientConfig,
   Client,
 } from "@line/bot-sdk";
+import birthText from "../messageTemplates/birthText";
+import birthdayFlex from "../messageTemplates/birthdayFlex";
 
 const clientConfig: ClientConfig = {
   channelAccessToken: process.env.ACCESS_TOKEN!,
@@ -21,10 +23,10 @@ export const birthWatcher = async () => {
     for (let i = 0; i < targetUsers.length; i++) {
       const user = targetUsers[i];
       promises.push(
-        client.pushMessage(user.lineId, {
-          type: "text",
-          text: `${user.displayName}さん、お誕生日おめでとうございます\u{2728}\u{2728}\n\nこれはお誕生日プレゼントメッセージです`,
-        })
+        client.pushMessage(user.lineId, [
+          birthdayFlex(),
+          birthText(user.displayName),
+        ])
       );
     }
 
