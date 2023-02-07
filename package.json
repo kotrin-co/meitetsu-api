@@ -1,13 +1,13 @@
 {
-  "name": "answer-serverless-dev",
+  "name": "meitetsu",
   "version": "2.1.1",
   "description": "Example application for running a Node Express app on AWS Lambda using Amazon API Gateway.",
   "main": "lambda.js",
   "config": {
-    "s3BucketName": "answer-serverless-bucket",
+    "s3BucketName": "kentaro-bucket",
     "region": "ap-northeast-1",
-    "cloudFormationStackName": "answer-serverless",
-    "functionName": "answer-serverless-lambda",
+    "cloudFormationStackName": "m-serverless",
+    "functionName": "m-serverless-lambda",
     "domain": ""
   },
   "scripts": {
@@ -36,6 +36,8 @@
     "body-parser": "^1.17.1",
     "compression": "^1.6.2",
     "cors": "^2.8.3",
+    "date-fns": "^2.29.3",
+    "date-fns-tz": "^2.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "qs": "^6.10.3",
@@ -46,6 +48,7 @@
     "@types/chai": "^4.2.21",
     "@types/compression": "^1.7.1",
     "@types/cors": "^2.8.12",
+    "@types/date-fns": "^2.6.0",
     "@types/ejs": "^3.1.0",
     "@types/express": "^4.17.13",
     "@types/helmet": "^4.0.0",

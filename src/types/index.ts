@@ -1,9 +1,5 @@
-export type UserRecord = {
+export type PlayerData = {
   lineId: string;
-  displayName: string;
-  followedAt: number;
-  invitedBy: string;
-  invite: string[];
-  birthday: string;
-  birthyear: string;
+  lineName: string;
+  followedAt: string;
 };

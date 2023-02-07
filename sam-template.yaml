@@ -1,19 +1,18 @@
 ---
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless Express Application/API powered by API Gateway and Lambda
 Parameters:
   DomainName:
     Type: String
     Description: API Domain name
-    Default: ''
+    Default: ""
 
 Conditions:
-  UseDomainName:
-    !Not
-      - !Equals
-        - !Ref DomainName
-        - ''
+  UseDomainName: !Not
+    - !Equals
+      - !Ref DomainName
+      - ""
 
 Resources:
   ExpressApi:
@@ -25,7 +24,9 @@ Resources:
       CodeUri: ./dist
       FunctionName: serverless-lambda-prd
       PackageType: Zip
-      Runtime: nodejs14.x
+      Runtime: nodejs16.x
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
       Handler: lambda.handler
       MemorySize: 1024
       Timeout: 30
@@ -35,26 +36,10 @@ Resources:
           Properties:
             ApiId: !Ref ExpressApi
 
-  cronLambdaFunction:
-    Type: AWS::Serverless::Function
+  TablePlayers:
+    Type: "AWS::DynamoDB::Table"
     Properties:
-      CodeUri: ./dist
-      FunctionName: birthday-watcher-prd
-      Handler: lambda.birthWatcher
-      MemorySize: 1024
-      Timeout: 30
-      Runtime: nodejs14.x
-      Events:
-        Schedule:
-          Type: Schedule
-          Properties:
-            Name: birth-watch-prd-rule
-            Schedule: cron(0 2 * * ? *)
-
-  Table:
-    Type: 'AWS::DynamoDB::Table'
-    Properties:
-      TableName: Users_Prd
+      TableName: players
       AttributeDefinitions:
         - AttributeName: lineId
           AttributeType: S
@@ -67,31 +52,47 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
+  TableManagers:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: managers
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
   MyApiCertificate:
-    Type: 'AWS::CertificateManager::Certificate'
+    Type: "AWS::CertificateManager::Certificate"
     Condition: UseDomainName
     Properties:
-      DomainName: !Sub '*.${DomainName}'
+      DomainName: !Sub "*.${DomainName}"
       DomainValidationOptions:
-        - DomainName: !Sub '*.${DomainName}'
+        - DomainName: !Sub "*.${DomainName}"
           ValidationDomain: !Ref DomainName
       SubjectAlternativeNames:
         - !Ref DomainName
 
   MyApiDomainName:
-    Type: 'AWS::ApiGateway::DomainName'
+    Type: "AWS::ApiGateway::DomainName"
     Condition: UseDomainName
     Properties:
       CertificateArn: !Ref MyApiCertificate
       DomainName: !Ref DomainName
 
   MyApiBasePathMapping:
-    Type: 'AWS::ApiGateway::BasePathMapping'
+    Type: "AWS::ApiGateway::BasePathMapping"
     Condition: UseDomainName
     Properties:
       RestApiId: !Ref ExpressApi
       DomainName: !Ref MyApiDomainName
-      BasePath: '(none)'
+      BasePath: "(none)"
       Stage: prod
 
   Route53HostedZone:
@@ -123,7 +124,8 @@ Outputs:
     Value: !Sub https://${AWS::Region}.console.aws.amazon.com/apigateway/home?region=${AWS::Region}#/apis/${ExpressApi}/stages/prod
 
   ApiUrl:
-    Description: Invoke URL for your API. Clicking this link will perform a GET request
+    Description:
+      Invoke URL for your API. Clicking this link will perform a GET request
       on the root resource of your API.
     Value: !Sub https://${ExpressApi}.execute-api.${AWS::Region}.amazonaws.com/
 

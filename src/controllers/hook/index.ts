@@ -1,14 +1,12 @@
-import {Request, Response} from "express";
-import {
-  WebhookEvent,
-} from "@line/bot-sdk";
-import {handleTextEvent} from "../funcs/handleMessageEvent";
-import handleFollowEvent from "../funcs/handleFollowEvent";
-import handlePostbackEvent from "../funcs/handlePostbackEvent";
+import { Request, Response } from "express";
+import { WebhookEvent } from "@line/bot-sdk";
+import { handleTextEvent } from "./eventHandlers/handleMessageEvent";
+import handleFollowEvent from "./eventHandlers/handleFollowEvent";
+// import handlePostbackEvent from "./eventHandlers/handlePostbackEvent";
 
 const linebot = async (req: Request, res: Response): Promise<void> => {
   const events: WebhookEvent[] = req.body.events;
-  const results = await Promise.all(
+  await Promise.all(
     events.map(async (event: WebhookEvent): Promise<void> => {
       try {
         switch (event.type) {
@@ -18,20 +16,16 @@ const linebot = async (req: Request, res: Response): Promise<void> => {
           case "message":
             await handleTextEvent(event);
             break;
-          case "postback":
-            await handlePostbackEvent(event);
-            break;
-
+          // case "postback":
+          //   await handlePostbackEvent(event);
+          //   break;
         }
       } catch (error) {
         console.log(error);
       }
     })
   );
-  res.status(200).json({
-    status: "success",
-    results
-  });
+  res.status(200).end();
 };
 
 export default linebot;

@@ -2,6 +2,9 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
