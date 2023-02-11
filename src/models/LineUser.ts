@@ -1,8 +1,8 @@
 import { dynamo } from '../app'
-import type { PlayerData } from '../types'
+import type { LineUserData } from '../types'
 import { getNowDatetime } from '../utils/timeGenerators'
 
-class Player {
+class LineUser {
   // 選手の新規登録
   public create(lineId: string, lineName: string): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
@@ -11,14 +11,14 @@ class Player {
       if (recordExistence) {
         resolve(false)
       } else {
-        const playerData: PlayerData = {
+        const userData: LineUserData = {
           lineId,
           lineName,
           followedAt: nowDatetime,
         }
         const insertParams = {
-          TableName: 'players',
-          Item: playerData,
+          TableName: 'lineusers',
+          Item: userData,
         }
 
         dynamo.put(insertParams, (err, data) => {
@@ -41,7 +41,7 @@ class Player {
 
       const lineId = 'Ubca9519f029b6af8e53a9b54ffe92cae' // 開発のため固定ID
       const selectParams = {
-        TableName: 'players',
+        TableName: 'lineusers',
         Key: {
           lineId,
         },
@@ -64,7 +64,7 @@ class Player {
   private checkRecordExistence(lineId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const selectParams = {
-        TableName: 'players',
+        TableName: 'lineusers',
         Key: {
           lineId,
         },
@@ -85,4 +85,4 @@ class Player {
   }
 }
 
-export default Player
+export default LineUser

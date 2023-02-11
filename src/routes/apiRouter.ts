@@ -1,9 +1,14 @@
-import express from "express";
-import getPlayer from "../controllers/api/getPlayer";
+import express from 'express'
+import getLineUser from '../controllers/api/getLineUser'
+import getAdmin from '../controllers/api/getAdmin'
+import managerRegistration from '../controllers/api/managerRegistration'
 
-const apiRouter = express.Router();
+const apiRouter = express.Router()
 
-// LINE Webhook
-apiRouter.post("/get-player", getPlayer);
+// ルーティング
+apiRouter
+  .post('/get-player', getLineUser)
+  .post('/get-admin', getAdmin)
+  .post('/manager-registration', managerRegistration)
 
-export default apiRouter;
+export default apiRouter

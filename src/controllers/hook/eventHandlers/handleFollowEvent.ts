@@ -1,6 +1,6 @@
 import { FollowEvent } from "@line/bot-sdk";
 import { client } from "../../../app";
-import Player from "../../../models/Player";
+import LineUser from "../../../models/LineUser";
 
 const handleFollowEvent = async (event: FollowEvent) => {
   if (event.type !== "follow") {
@@ -14,8 +14,8 @@ const handleFollowEvent = async (event: FollowEvent) => {
   const profile = await client.getProfile(lineId);
   const displayName = profile.displayName;
 
-  const player = new Player();
-  const insert = await player.create(lineId, displayName);
+  const user = new LineUser();
+  const insert = await user.create(lineId, displayName);
   const message = insert
     ? `${displayName}さんをDynamoDBへ格納成功`
     : `${displayName}さんはすでにお友だち登録されています`;

@@ -1,18 +1,18 @@
 ---
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Serverless Express Application/API powered by API Gateway and Lambda
 Parameters:
   DomainName:
     Type: String
     Description: API Domain name
-    Default: ""
+    Default: ''
 
 Conditions:
   UseDomainName: !Not
     - !Equals
       - !Ref DomainName
-      - ""
+      - ''
 
 Resources:
   ExpressApi:
@@ -37,9 +37,9 @@ Resources:
             ApiId: !Ref ExpressApi
 
   TablePlayers:
-    Type: "AWS::DynamoDB::Table"
+    Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: players
+      TableName: lineusers
       AttributeDefinitions:
         - AttributeName: lineId
           AttributeType: S
@@ -52,15 +52,15 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
-  TableManagers:
-    Type: "AWS::DynamoDB::Table"
+  TableAdmins:
+    Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: managers
+      TableName: admins
       AttributeDefinitions:
-        - AttributeName: id
+        - AttributeName: email
           AttributeType: S
       KeySchema:
-        - AttributeName: id
+        - AttributeName: email
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -69,30 +69,30 @@ Resources:
         StreamViewType: NEW_IMAGE
 
   MyApiCertificate:
-    Type: "AWS::CertificateManager::Certificate"
+    Type: 'AWS::CertificateManager::Certificate'
     Condition: UseDomainName
     Properties:
-      DomainName: !Sub "*.${DomainName}"
+      DomainName: !Sub '*.${DomainName}'
       DomainValidationOptions:
-        - DomainName: !Sub "*.${DomainName}"
+        - DomainName: !Sub '*.${DomainName}'
           ValidationDomain: !Ref DomainName
       SubjectAlternativeNames:
         - !Ref DomainName
 
   MyApiDomainName:
-    Type: "AWS::ApiGateway::DomainName"
+    Type: 'AWS::ApiGateway::DomainName'
     Condition: UseDomainName
     Properties:
       CertificateArn: !Ref MyApiCertificate
       DomainName: !Ref DomainName
 
   MyApiBasePathMapping:
-    Type: "AWS::ApiGateway::BasePathMapping"
+    Type: 'AWS::ApiGateway::BasePathMapping'
     Condition: UseDomainName
     Properties:
       RestApiId: !Ref ExpressApi
       DomainName: !Ref MyApiDomainName
-      BasePath: "(none)"
+      BasePath: '(none)'
       Stage: prod
 
   Route53HostedZone:
