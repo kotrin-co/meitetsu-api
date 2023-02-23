@@ -14,8 +14,9 @@ export const client = new Client(clientConfig)
 export const dynamo = new DynamoDB.DocumentClient()
 
 const allowedOrigins = [
-  'https://main.digujj42u353j.amplifyapp.com/',
+  'https://main.digujj42u353j.amplifyapp.com',
   'http://localhost:3000',
+  'https://main.d2cbpj3a1zecyk.amplifyapp.com',
 ]
 const corsOptions: cors.CorsOptions = {
   origin: allowedOrigins,

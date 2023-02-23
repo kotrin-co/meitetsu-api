@@ -27,6 +27,63 @@ class Admin {
     })
   }
 
+  // 全ての管理者データの抜き出し
+  public async getAdmins() {
+    return new Promise((resolve, reject) => {
+      const params = {
+        TableName: 'admins', // テーブル名
+        IndexName: 'type-index', // 作成したGSI名
+        KeyConditionExpression: '#indexKey = :indexValue', // 条件を指定
+        ExpressionAttributeNames: {
+          '#indexKey': 'type', // GSIの作成時に指定したキー名を設定
+        },
+        ExpressionAttributeValues: {
+          ':indexValue': 'admin',
+        },
+      }
+      dynamo.query(params, (err, data) => {
+        if (err) reject(err)
+        console.log('admin', data)
+        if (data.Items) {
+          console.log('admin data', data.Items)
+          resolve(data.Items)
+        } else {
+          resolve({})
+        }
+      })
+    })
+  }
+
+  // 全ての監督データの抜き出し
+  public getManagers() {
+    return new Promise((resolve, reject) => {
+      const params = {
+        TableName: 'admins', // テーブル名
+        IndexName: 'type-index', // 作成したGSI名
+        KeyConditionExpression: '#indexKey = :indexValue', // 条件を指定
+        ExpressionAttributeNames: {
+          '#indexKey': 'type', // GSIの作成時に指定したキー名を設定
+        },
+        ExpressionAttributeValues: {
+          ':indexValue': 'manager',
+        },
+      }
+
+      dynamo.query(params, (err, data) => {
+        if (err) reject(err)
+
+        console.log('managers', data)
+
+        if (data.Items) {
+          console.log('admin data', data.Items)
+          resolve(data.Items)
+        } else {
+          resolve({})
+        }
+      })
+    })
+  }
+
   // 監督情報の登録（重複：false、登録成功:trueを返す）
   public create(email: string, team: string, name: string): Promise<boolean> {
     return new Promise((resolve, reject) => {

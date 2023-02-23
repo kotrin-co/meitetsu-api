@@ -68,6 +68,22 @@ Resources:
       StreamSpecification:
         StreamViewType: NEW_IMAGE
 
+  # TableRecords:
+  #   Type: 'AWS::DynamoDB::Table'
+  #   Properties:
+  #     TableName: dailyrecords
+  #     AttributeDefinitions:
+  #       - AttributeName: lineId
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: lineId
+  #         KeyType: HASH
+  #     ProvisionedThroughput:
+  #       ReadCapacityUnits: 5
+  #       WriteCapacityUnits: 5
+  #     StreamSpecification:
+  #       StreamViewType: NEW_IMAGE
+
   MyApiCertificate:
     Type: 'AWS::CertificateManager::Certificate'
     Condition: UseDomainName
