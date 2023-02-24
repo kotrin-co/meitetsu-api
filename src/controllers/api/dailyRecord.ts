@@ -6,9 +6,9 @@ const dailyRecord = async (req: Request, res: Response) => {
   const { idToken, date, weight, content, remarks } = req.body
   console.log('daily record:', date, weight, content, remarks)
 
-  // const player = new LineUser()
-  // const lineId = await player.getLineIdByIdToken(idToken)
-  const lineId = 'Ubca9519f029b6af8e53a9b54ffe92cae'
+  const player = new LineUser()
+  const lineId = await player.getLineIdByIdToken(idToken)
+  // const lineId = 'Ubca9519f029b6af8e53a9b54ffe92cae'
 
   const record = new Record()
 
