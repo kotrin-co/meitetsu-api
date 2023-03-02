@@ -4,6 +4,15 @@ export type LineUserData = {
   followedAt: string
 }
 
+export type PlayerData = LineUserData & {
+  sex: string
+  birthday: string
+  agreement: boolean
+  displayName: string
+  positions: string[]
+  team: string
+}
+
 export type PlayerRegistrationData = {
   idToken: string
   birthday: string
@@ -30,4 +39,12 @@ export type RecordData = {
   remarks: string
   updatedAt: string
   weight: number
+}
+
+export type ManagerComment = {
+  email: string
+  name: string
+  comment: string
+  createdAt: string
+  updatedAt: string
 }

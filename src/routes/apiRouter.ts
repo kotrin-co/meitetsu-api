@@ -6,6 +6,7 @@ import getManagers from '../controllers/api/getManagers'
 import playerRegistration from '../controllers/api/playerRegistration'
 import dailyRecord from '../controllers/api/dailyRecord'
 import getRecords from '../controllers/api/getRecords'
+import getTeamRecords from '../controllers/api/getTeamRecords'
 
 const apiRouter = express.Router()
 
@@ -18,5 +19,6 @@ apiRouter
   .post('/player-registration', playerRegistration)
   .post('/daily-record', dailyRecord)
   .post('/get-records', getRecords)
+  .post('/get-team-records', getTeamRecords)
 
 export default apiRouter

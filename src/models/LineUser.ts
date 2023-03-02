@@ -44,26 +44,40 @@ class LineUser {
       // idtokenからlineIdを取得する処理は後ほど実装する
       this.getLineIdByIdToken(idToken)
         .then((lineId) => {
-          // const lineId = 'Ubca9519f029b6af8e53a9b54ffe92cae' // 開発のため固定ID
-          const selectParams = {
-            TableName: 'lineusers',
-            Key: {
-              lineId,
-            },
-          }
-
-          dynamo.get(selectParams, (err, data) => {
-            if (err) reject(err)
-
-            if (data.Item) {
-              console.log('player data', data.Item)
-              resolve(data.Item)
-            } else {
-              resolve({})
-            }
-          })
+          this.getUserByLineId(lineId)
+            .then((user) => resolve(user))
+            .catch((e) => reject(e))
         })
         .catch((e) => reject(e))
+    })
+  }
+
+  // チームの選手の取得
+  public getTeamMembers(team: string) {
+    return new Promise((resolve, reject) => {
+      // クエリパラメータ
+      const params = {
+        TableName: 'lineusers', // テーブル名
+        IndexName: 'team-index', // 作成したGSI名
+        KeyConditionExpression: '#indexKey = :indexValue', // 条件を指定
+        ExpressionAttributeNames: {
+          '#indexKey': 'team', // GSIの作成時に指定したキー名を設定
+        },
+        ExpressionAttributeValues: {
+          ':indexValue': team,
+        },
+      }
+
+      dynamo.query(params, (err, data) => {
+        if (err) reject(err)
+
+        if (data.Items) {
+          console.log('team members', data.Items)
+          resolve(data.Items)
+        } else {
+          resolve({})
+        }
+      })
     })
   }
 
@@ -158,6 +172,29 @@ class LineUser {
           resolve(lineId)
         })
         .catch((e) => reject(e))
+    })
+  }
+
+  // lineIdからユーザー情報を取得する
+  public getUserByLineId(lineId: string) {
+    return new Promise((resolve, reject) => {
+      const selectParams = {
+        TableName: 'lineusers',
+        Key: {
+          lineId,
+        },
+      }
+
+      dynamo.get(selectParams, (err, data) => {
+        if (err) reject(err)
+
+        if (data.Item) {
+          console.log('player data', data.Item)
+          resolve(data.Item)
+        } else {
+          resolve({})
+        }
+      })
     })
   }
 }
