@@ -4,10 +4,10 @@
   "description": "Example application for running a Node Express app on AWS Lambda using Amazon API Gateway.",
   "main": "lambda.js",
   "config": {
-    "s3BucketName": "kentaro-bucket",
+    "s3BucketName": "meicom-bucket",
     "region": "ap-northeast-1",
-    "cloudFormationStackName": "m-serverless",
-    "functionName": "m-serverless-lambda",
+    "cloudFormationStackName": "meitetsu-backend",
+    "functionName": "meitetsu-serverless-api",
     "domain": ""
   },
   "scripts": {

@@ -14,9 +14,11 @@ export const client = new Client(clientConfig)
 export const dynamo = new DynamoDB.DocumentClient()
 
 const allowedOrigins = [
-  'https://main.digujj42u353j.amplifyapp.com',
+  'https://main.digujj42u353j.amplifyapp.com', // 多分不要
   'http://localhost:3000',
-  'https://main.d2cbpj3a1zecyk.amplifyapp.com',
+  'https://main.d2cbpj3a1zecyk.amplifyapp.com', // 多分不要
+  'https://main.d3foe3m2eoatxa.amplifyapp.com',
+  'https://www.dev.memolin.meicomds.com',
 ]
 const corsOptions: cors.CorsOptions = {
   origin: allowedOrigins,

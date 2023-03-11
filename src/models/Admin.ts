@@ -2,6 +2,9 @@ import { dynamo } from '../app'
 import * as _ from 'lodash'
 import { getNowDatetime } from '../utils/timeGenerators'
 import type { AdminData } from '../types'
+import { CognitoIdentityServiceProvider } from 'aws-sdk'
+const cognito = new CognitoIdentityServiceProvider()
+const userPoolId = process.env.USER_POOL_ID || ''
 
 class Admin {
   // emailより監督or管理者の情報取得
@@ -85,37 +88,123 @@ class Admin {
   }
 
   // 監督情報の登録（重複：false、登録成功:trueを返す）
-  public create(email: string, team: string, name: string): Promise<boolean> {
+  public create(
+    email: string,
+    team: string,
+    name: string
+  ): Promise<AdminData | null> {
     return new Promise((resolve, reject) => {
       // emailですでに登録がないかチェック
       this.get(email).then((data) => {
         // すでに登録済みの場合は終了
-        if (!_.isEmpty(data)) resolve(false)
+        if (!_.isEmpty(data)) resolve(null)
 
-        // 未登録の場合は登録処理を進める
-        const nowDatetime = getNowDatetime() // 登録日時
-        const adminData: AdminData = {
-          email,
-          team,
-          name,
-          type: 'manager',
-          registeredAt: nowDatetime,
-        }
-        const insertParams = {
-          TableName: 'admins',
-          Item: adminData,
-        }
+        // 未登録の場合はcognitoへユーザー登録する
+        cognito
+          .adminCreateUser({
+            UserPoolId: userPoolId,
+            Username: email,
+          })
+          .promise()
+          .then((user) => {
+            console.log('登録完了', JSON.stringify(user, null, 4))
 
-        dynamo.put(insertParams, (err, data) => {
-          if (err) {
-            console.log(err)
-            reject(err)
-          } else {
-            console.log('manager created successfully!', data)
-            resolve(true)
-          }
-        })
+            // 未登録の場合はdynamoDBへ登録する
+            const nowDatetime = getNowDatetime() // 登録日時
+            const adminData: AdminData = {
+              email,
+              team,
+              name,
+              type: 'manager',
+              registeredAt: nowDatetime,
+            }
+            const insertParams = {
+              TableName: 'admins',
+              Item: adminData,
+            }
+
+            dynamo.put(insertParams, (err, data) => {
+              if (err) {
+                console.log(err)
+                reject(err)
+              } else {
+                this.get(email)
+                  .then((manager) => {
+                    console.log('manager created successfully!', manager)
+                    resolve(manager as AdminData)
+                  })
+                  .catch((e) => reject(e))
+              }
+            })
+          })
       })
+    })
+  }
+
+  // 監督データの更新
+  public update(email: string, team: string, name: string): Promise<AdminData> {
+    return new Promise((resolve, reject) => {
+      const updatedAt = getNowDatetime()
+      // 更新パラメータ
+      const params = {
+        TableName: 'admins',
+        Key: {
+          email,
+        },
+        UpdateExpression: 'set #n = :name, #t = :team, #r = :registeredAt',
+        ExpressionAttributeNames: {
+          '#n': 'name',
+          '#t': 'team',
+          '#r': 'registeredAt',
+        },
+        ExpressionAttributeValues: {
+          ':name': name,
+          ':team': team,
+          ':registeredAt': updatedAt,
+        },
+        ReturnValues: 'ALL_NEW',
+      }
+
+      dynamo.update(params, (err, data) => {
+        if (err) {
+          console.error(err)
+          reject(err)
+        }
+
+        const manager = data.Attributes as AdminData
+        console.log('dynamo update', data.Attributes)
+        resolve(manager)
+      })
+    })
+  }
+
+  // 監督データの削除
+  public delete(email: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      // ユーザープールから削除
+      cognito
+        .adminDeleteUser({
+          UserPoolId: userPoolId,
+          Username: email,
+        })
+        .promise()
+        .then(() => {
+          // dynamoから削除
+          const params = {
+            TableName: 'admins',
+            Key: {
+              email,
+            },
+          }
+
+          dynamo.delete(params, (err, data) => {
+            if (err) reject(err)
+
+            console.log('dynamo delete admin:', data)
+            resolve(true)
+          })
+        })
+        .catch((e) => reject(e))
     })
   }
 }

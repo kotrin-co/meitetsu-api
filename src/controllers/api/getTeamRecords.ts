@@ -10,7 +10,7 @@ const getTeamRecords = async (req: Request, res: Response) => {
 
   const lineUser = new LineUser()
   const players = (await lineUser.getTeamMembers(team)) as Array<
-    PlayerData & { latestUpdate?: string }
+    PlayerData & { latestUpdate?: { updatedAt: string; date: string } }
   >
 
   const record = new Record()
@@ -32,10 +32,13 @@ const getTeamRecords = async (req: Request, res: Response) => {
       })
 
     if (sortedRecords.length)
-      player.latestUpdate = format(
-        new Date(sortedRecords[0].updatedAt),
-        'M/d H:mm'
-      )
+      player.latestUpdate = {
+        updatedAt: format(
+          new Date(sortedRecords[0].updatedAt),
+          'yyyy-MM-dd HH:mm:ss'
+        ),
+        date: sortedRecords[0].date,
+      }
   })
 
   res.status(200).json({

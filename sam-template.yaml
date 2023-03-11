@@ -22,26 +22,37 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./dist
-      FunctionName: serverless-lambda-prd
+      FunctionName: serverless-api-dev
       PackageType: Zip
       Runtime: nodejs16.x
       Policies:
         - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
       Handler: lambda.handler
-      MemorySize: 1024
+      MemorySize: 2048
       Timeout: 30
       Events:
         ProxyApiRoot:
           Type: HttpApi
           Properties:
             ApiId: !Ref ExpressApi
+      Environment:
+        Variables:
+          ACCESS_TOKEN: '{{resolve:secretsmanager:meitetsu/api/env:SecretString:ACCESS_TOKEN}}'
+          CHANNEL_SECRET: '{{resolve:secretsmanager:meitetsu/api/env:SecretString:CHANNEL_SECRET}}'
+          LINE_LOGIN_CHANNEL_ID: '{{resolve:secretsmanager:meitetsu/api/env:SecretString:LINE_LOGIN_CHANNEL_ID}}'
+          RICHMENU_ID_1: '{{resolve:secretsmanager:meitetsu/api/env:SecretString:RICHMENU_ID_1}}'
+          RICHMENU_ID_2: '{{resolve:secretsmanager:meitetsu/api/env:SecretString:RICHMENU_ID_2}}'
+          USER_POOL_ID: '{{resolve:secretsmanager:meitetsu/api/env:SecretString:USER_POOL_ID}}'
 
-  TablePlayers:
+  TableLineUsers:
     Type: 'AWS::DynamoDB::Table'
     Properties:
       TableName: lineusers
       AttributeDefinitions:
         - AttributeName: lineId
+          AttributeType: S
+        - AttributeName: team
           AttributeType: S
       KeySchema:
         - AttributeName: lineId
@@ -51,6 +62,16 @@ Resources:
         WriteCapacityUnits: 5
       StreamSpecification:
         StreamViewType: NEW_IMAGE
+      GlobalSecondaryIndexes:
+        - IndexName: team-index
+          KeySchema:
+            - AttributeName: team
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
 
   TableAdmins:
     Type: 'AWS::DynamoDB::Table'
@@ -59,6 +80,8 @@ Resources:
       AttributeDefinitions:
         - AttributeName: email
           AttributeType: S
+        - AttributeName: type
+          AttributeType: S
       KeySchema:
         - AttributeName: email
           KeyType: HASH
@@ -67,26 +90,50 @@ Resources:
         WriteCapacityUnits: 5
       StreamSpecification:
         StreamViewType: NEW_IMAGE
+      GlobalSecondaryIndexes:
+        - IndexName: type-index
+          KeySchema:
+            - AttributeName: type
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
 
-  # TableRecords:
-  #   Type: 'AWS::DynamoDB::Table'
-  #   Properties:
-  #     TableName: dailyrecords
-  #     AttributeDefinitions:
-  #       - AttributeName: lineId
-  #         AttributeType: S
-  #       - AttributeName: date
-  #         AttributeType: S
-  #     KeySchema:
-  #       - AttributeName: lineId
-  #         KeyType: HASH
-  #       - AttributeName: date
-  #         KeyType: RANGE
-  #     ProvisionedThroughput:
-  #       ReadCapacityUnits: 5
-  #       WriteCapacityUnits: 5
-  #     StreamSpecification:
-  #       StreamViewType: NEW_IMAGE
+  TableRecords:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: dailyrecords
+      AttributeDefinitions:
+        - AttributeName: lineId
+          AttributeType: S
+        - AttributeName: date
+          AttributeType: S
+        - AttributeName: team
+          AttributeType: S
+      KeySchema:
+        - AttributeName: lineId
+          KeyType: HASH
+        - AttributeName: date
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      GlobalSecondaryIndexes:
+        - IndexName: team-date-index
+          KeySchema:
+            - AttributeName: team
+              KeyType: HASH
+            - AttributeName: date
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
 
   MyApiCertificate:
     Type: 'AWS::CertificateManager::Certificate'

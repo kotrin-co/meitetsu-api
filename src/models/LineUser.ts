@@ -1,10 +1,11 @@
-import { dynamo } from '../app'
+import { dynamo, client } from '../app'
 import type { LineUserData, PlayerRegistrationData } from '../types'
 import { getNowDatetime } from '../utils/timeGenerators'
 import axios from 'axios'
 import * as qs from 'qs'
 
 const LINE_LOGIN_CHANNEL_ID = process.env.LINE_LOGIN_CHANNEL_ID || ''
+const RICHMENU_ID_2 = process.env.RICHMENU_ID_2 || ''
 
 class LineUser {
   // 選手の新規登録
@@ -124,7 +125,12 @@ class LineUser {
               if (err) reject(err)
 
               console.log('dynamo update', data)
-              resolve()
+
+              // 登録成功したらリッチメニューを切り替える
+              client
+                .linkRichMenuToUser(lineId, RICHMENU_ID_2)
+                .then(() => resolve())
+                .catch((e) => reject(e))
             })
           })
         })
