@@ -3,15 +3,34 @@
 ## クローン
 
 ```
-git clone https://github.com/kotrin-co/answer-serverless.git project-name
+git clone https://github.com/kotrin-co/meitetsu-api.git <project-name>
 ```
 
-## 設定
+## package.json の設定
 
-AWS 関連の設定を調整します。下記コマンドを環境に合わせて利用します。
+- package.json にて設定を変更する
+- 特に S3 のバケット名は重複が許されないため、Dev と Prd ともに一意の命名とする
+
+## 開発環境設定
 
 ```
-npm run config -- --account-id="<accountId>" \
---bucket-name="<bucketName>" \
---region="<region>"
+npm run setup-dev
+```
+
+## 開発環境デプロイ
+
+```
+npm run package-deploy-dev
+```
+
+## 本番環境設定
+
+```
+npm run setup-prd
+```
+
+## 本番環境デプロイ
+
+```
+npm run package-deploy-prd
 ```
