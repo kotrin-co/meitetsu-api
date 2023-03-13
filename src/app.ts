@@ -17,7 +17,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://main.d3foe3m2eoatxa.amplifyapp.com', // dev
   'https://www.dev.memolin.meicomds.com', // dev
-  'https://main.d479j7ev99tum.amplifyapp.com', //prd
+  'https://main.d479j7ev99tum.amplifyapp.com', // prd
+  'https://www.management.memolin.meicomds.com', // prd
 ]
 const corsOptions: cors.CorsOptions = {
   origin: allowedOrigins,
